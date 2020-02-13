@@ -1,4 +1,4 @@
-# DistanceSensorEvaluation
+# Evaluation of diverse distance sensors
 
 Test scripts for different distance sensors. The programs use the Arduino IDE, with the following required libraries:
 
