@@ -1,10 +1,22 @@
-#include <NewPing.h>
+#include <Wire.h>
+
+#include "NewPing.h"
+#include "VL53L0X.h"
 
 #define TRIGGER_PIN  9  // Arduino pin tied to trigger pin on the ultrasonic sensor.
 #define ECHO_PIN     10  // Arduino pin tied to echo pin on the ultrasonic sensor.
 #define MAX_DISTANCE 100 // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
 
 NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
+VL53L0X vl53l0x;
+
+enum class SensorType {
+  HC04 = 0,
+  VL53L0X = 1,
+  VL53L1X = 2,
+};
+
+const SensorType SensorToUse = SensorType::VL53L0X;
 
 struct MeasurementResult {
   float mean;
@@ -87,17 +99,34 @@ void showMeasurement(const MeasurementResult& m) {
 
 void setup() {
   Serial.begin(115200); // Open serial monitor at 115200 baud to see ping results.
+  if (SensorToUse == SensorType::VL53L0X) {
+    Wire.begin();
+    vl53l0x.setTimeout(500);
+    if(!vl53l0x.init()) {
+      Serial.println("Faild to detect and initialize sensor!");
+      while (true) {}
+    }
+    vl53l0x.startContinuous();
+  }
 }
 
 void loop() {
-  unsigned int sum_cm = 0;
-  unsigned int errors = 0;
-  const int NUM_MEASUREMENTS = 50;
-  MeasurementResult sr04;
-  doMeasurement([](){return sonar.ping_cm(); }, sr04);
+
+  MeasurementResult result;
+  if (SensorToUse == SensorType::HC04)
+    doMeasurement([](){return sonar.ping_cm(); }, result);
+  else if (SensorToUse == SensorType::VL53L0X)
+    doMeasurement([](){
+	float v = vl53l0x.readRangeContinuousMillimeters() / 10;
+	if (vl53l0x.timeoutOccurred())
+	  return 0.0f;
+	else return v;
+      }, result);
+  else
+    Serial.println("ERROR in sensor choice!");
 
   Serial.println("=============================");
-  showMeasurement(sr04);
+  showMeasurement(result);
 
 
   delay(50);
