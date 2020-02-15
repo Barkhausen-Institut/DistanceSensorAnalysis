@@ -18,23 +18,43 @@ data_vl53l0x = [[60, 35.06 , 0.34 , 31.33 , -1.06 , 0.94 ],
                 [10, 15.17 , 0.51 , 31.25 , -1.17 , 0.83 ],
                 [5, 10.01 , 0.10 , 31.19 , -0.01 , 0.99 ]];
 
-data = np.array(data_vl53l0x)
+data_vl53l1x = [[60 , 53.32 , 0.47 , 18.51 , -0.32 , 0.68 ],
+                [50 , 48.12 , 0.33 , 18.56 , -0.12 , 0.88 ],
+                [40 , 39.02 , 0.14 , 18.45 , -0.02 , 0.98 ],
+                [30 , 29.11 , 0.31 , 18.42 , -0.11 , 0.89 ],
+                [20 , 20.35 , 0.48 , 18.55 , -0.35 , 0.65 ],
+                [15 , 15.20 , 0.40 , 18.54 , -0.20 , 0.80 ],
+                [10 , 10.60 , 0.49 , 18.58 , -0.60 , 0.40 ],
+                [5 , 4.11 , 0.31 , 18.43 , -0.11 , 0.89 ]]
 
-x = data[:,0]
-mean = data[:,1]
-std = data[:,2]
-ms = data[:,3]
+data = np.array(data_vl53l1x)
+
+def plot(data, label):
+
+    x = data[:,0]
+    mean = data[:,1]
+    std = data[:,2]
+    ms = data[:,3]
+
+    plt.subplot(121)
+    plt.plot(x, mean, label=label)
+    plt.xlabel('Actual distance (cm)')
+    plt.ylabel('Measured distance (cm)')
+    plt.legend()
+    plt.grid(True)
+
+    plt.subplot(122)
+    plt.plot(x, ms, label=label)
+    plt.xlabel('Actual distance (cm)')
+    plt.ylabel('Measurement duration (ms)')
+    plt.legend()
+    plt.grid(True)
 
 plt.subplot(121)
-plt.plot(x, mean)
-plt.xlabel('Actual distance (cm)')
-plt.ylabel('Measured distance (cm)')
-plt.grid(True)
+plt.plot([0, 60], [0, 60], 'k--')
 
-plt.subplot(122)
-plt.plot(x, ms)
-plt.xlabel('Actual distance (cm)')
-plt.ylabel('Measurement duration (ms)')
-plt.grid(True)
-
+plot(np.array(data_hc04), "SR-HC04")
+plot(np.array(data_vl53l0x), "VL53L0X")
+plot(np.array(data_vl53l1x), "VL53L1X")
+plt.subplot(121)
 plt.show()
