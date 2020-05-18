@@ -18,6 +18,7 @@ enum class SensorType {
   VL53L1X = 2,
 };
 
+// Replace with the sensor name you want to investigate
 const SensorType SensorToUse = SensorType::VL53L1X;
 
 struct MeasurementResult {
